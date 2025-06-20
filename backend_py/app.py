@@ -1,15 +1,8 @@
 import os
-import time
 import pandas as pd
-from flask import Flask, request, render_template, url_for, send_from_directory, redirect
-from rapidfuzz import process, fuzz
-import re
-from flask import session
-import secrets
-from dotenv import load_dotenv
-from unidecode import unidecode
-from flask import jsonify
+from flask import Flask, request, session, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -25,22 +18,20 @@ users = {
     'lorenzo': os.getenv('LORENZO_PASSWORD')
 }
 
-
 @app.route('/api/login', methods=['POST'])
 def login():
-    error = None  # inizializzo la variabile error
-    if request.method == 'POST':
-        user = request.form['username']
-        pwd = request.form['password']
-        if user in users and users[user] == pwd:
-            session['username'] = user
-            return jsonify({"success": True})
-        return jsonify({"success": False, "error": "Credenziali errate!"}), 401
+    user = request.form.get('username')
+    pwd = request.form.get('password')
+
+    if not user or not pwd:
+        return jsonify({"success": False, "error": "Username e password richiesti"}), 400
+
+    if user in users and users[user] == pwd:
+        session['username'] = user
+        return jsonify({"success": True})
+
+    return jsonify({"success": False, "error": "Credenziali errate!"}), 401
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run(host='0.0.0.0', port=8000, debug=True)
-=======
-    app.run(host='0.0.0.0', port=8000, debug=True)
->>>>>>> 5aec459 (second commit)
